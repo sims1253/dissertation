@@ -7,6 +7,8 @@ library(bayesplot)
 library(brms)
 library(posterior)
 
+setwd("~/Documents/dr/dissertation/")
+
 PALETTE = palette.colors(palette = "Okabe-Ito")
 color_scheme_set(PALETTE[2:7])
 
@@ -481,7 +483,7 @@ mh_norm_par <- function(y, init = 0, iter = 10000) {
   return(mu_t)
 }
 
-data = list(y = rnorm(1000, 42, 3))
+data = list(y = rnorm(200, 42, 3))
 mu_samples_1 <- mh_norm_par(data$y, init = 41, iter = 50)
 mu_samples_2 <- mh_norm_par(data$y, init = 43, iter = 50)
 
@@ -504,30 +506,34 @@ p2 = p2 + theme_bw(base_size = 12) +
   scale_y_continuous(limits = c(41, 43), breaks = c(41, 42, 43))
 
 
-m1 = brm(y ~ 1, data = data, chains = 2)
+m1 = brm(y ~ 1, data = data, chains = 2, file = "models/m1")
 
-p3 = mcmc_areas(m1, pars = "b_Intercept", size = 2) +
+
+p3 = mcmc_areas(m1, pars = "b_Intercept") +
+  coord_flip() +
   theme_bw(base_size = 12) +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
-        axis.text.y =element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.title.y = element_blank(),
         axis.ticks.y = element_blank(),
-        axis.title.x = element_text()) +
-  labs(x = TeX("$\\theta$"))
+        axis.text.y = element_blank())
 
-p3 = mcmc_trace(m1, pars = "b_Intercept", size = 2)
-p3 = p3 + theme_bw(base_size = 12) +
-  theme(axis.title.y = element_blank(),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        axis.text.y = element_blank(),
-        axis.ticks.y = element_blank(),
-        axis.title.x = element_text()) +
-  labs(x = "iter")
+
+# p3 = mcmc_trace(m1, pars = "b_Intercept", size = 2)
+# p3 = p3 + theme_bw(base_size = 12) +
+#   theme(axis.title.y = element_blank(),
+#         panel.grid.major = element_blank(),
+#         panel.grid.minor = element_blank(),
+#         axis.text.y = element_blank(),
+#         axis.ticks.y = element_blank(),
+#         axis.title.x = element_text()) +
+#   labs(x = "iter")
 
 (p1 + guides(color = "none") + p2 + p3) + 
   plot_layout(guides = 'collect') & 
-  theme(legend.position = "bottom",
+  theme(legend.position = "none",
         legend.margin = margin(t = -10, b = -10),
         legend.spacing.y = unit(0.1, "cm"),
         legend.key.width = unit(1, "cm"))
