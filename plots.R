@@ -6,6 +6,7 @@ library(purrr)
 library(bayesplot)
 library(brms)
 library(posterior)
+library(dplyr)
 
 setwd("~/Documents/dr/dissertation/")
 
@@ -390,60 +391,61 @@ ggsave(filename = "figures/sequential_updating.pdf",
        width = 210-50, height = ((297 - 70)/4) * 0.8, units = "mm", useDingbats = TRUE)
 
 
-## 1.1.4 MCMC
-set.seed(2025)
-steps = 5
+# 1.3 Sampling
+set.seed(2112)
+steps = 8
 
-# First create the taken data
+# First create the chain with proper MH behavior
 taken <- data.frame(iter = 1:steps,
-                    theta = rnorm(steps, mean = 42, sd = 0.25),
-                    proposal = rep("accepted", steps))
+                    theta = NA,
+                    proposal = "accepted")
 
-# Create multiple proposals (let's say 10 different lines)
-n_proposals <- 2
-prop_1 <- data.frame(
-  iter = rep(c(1, 2), each = n_proposals),
-  theta = c(rep(taken$theta[[1]], n_proposals), rnorm(n_proposals, mean = taken$theta[[1]], sd = 0.25)),
-  line = rep(1:n_proposals, 2),  # Add line identifier for grouping
-  proposal = rep("rejected", 2*n_proposals)
-)
+# Initialize first value
+taken$theta[1] <- rnorm(1, mean = 42, sd = 0.25)
 
-n_proposals <- 4
-prop_2 <- data.frame(
-  iter = rep(c(2, 3), each = n_proposals),
-  theta = c(rep(taken$theta[[2]], n_proposals), rnorm(n_proposals, mean = taken$theta[[2]], sd = 0.25)),
-  line = rep(1:n_proposals, 2),
-  proposal = rep("rejected", 2*n_proposals)# Add line identifier for grouping
-)
+props_list <- list()
+prop_counter <- 1
 
-n_proposals <- 1
-prop_3 <- data.frame(
-  iter = rep(c(3, 4), each = n_proposals),
-  theta = c(rep(taken$theta[[3]], n_proposals), rnorm(n_proposals, mean = taken$theta[[3]], sd = 0.25)),
-  line = rep(1:n_proposals, 2),
-  proposal = rep("rejected", 2*n_proposals)# Add line identifier for grouping
-)
+for(current_iter in 2:steps) {
+  # Generate a single proposal
+  proposal <- rnorm(1, mean = taken$theta[current_iter-1], sd = 0.5)
+  
+  # Accept with 70% probability
+  if(runif(1) < 0.4) {
+    taken$theta[current_iter] <- proposal
+  } else {
+    # If rejected, store the proposal and keep previous value
+    taken$theta[current_iter] <- taken$theta[current_iter-1]
+    
+    # Store single rejected proposal
+    props_list[[prop_counter]] <- data.frame(
+      iter = c(current_iter-1, current_iter),
+      theta = c(taken$theta[current_iter-1], proposal),
+      line = 1,
+      proposal = "rejected"
+    )
+    prop_counter <- prop_counter + 1
+  }
+}
 
-n_proposals <- 3
-prop_4 <- data.frame(
-  iter = rep(c(4, 5), each = n_proposals),
-  theta = c(rep(taken$theta[[4]], n_proposals), rnorm(n_proposals, mean = taken$theta[[4]], sd = 0.25)),
-  line = rep(1:n_proposals, 2),
-  proposal = rep("rejected", 2*n_proposals)# Add line identifier for grouping
-)
-
-# Plot with the proposals grouped by line
+# Plot
 p1 = ggplot() +
-  geom_line(aes(x = iter, y = theta, group = line, color = proposal), data = prop_1, alpha = 0.5) +
-  geom_point(aes(x = iter, y = theta, color = proposal), data = prop_1, alpha = 0.5) +
-geom_line(aes(x = iter, y = theta, group = line, color = proposal), data = prop_2, alpha = 0.5) +
-  geom_point(aes(x = iter, y = theta, color = proposal), data = prop_2, alpha = 0.5) +
-geom_line(aes(x = iter, y = theta, group = line, color = proposal), data = prop_3, alpha = 0.5) +
-  geom_point(aes(x = iter, y = theta, color = proposal), data = prop_3, alpha = 0.5) +
-  geom_line(aes(x = iter, y = theta, group = line, color = proposal), data = prop_4, alpha = 0.5) +
-  geom_point(aes(x = iter, y = theta, color = proposal), data = prop_4, alpha = 0.5) +
-  geom_line(aes(x = iter, y = theta, color = proposal), data = taken,  linewidth = 0.7) +
-  geom_point(aes(x = iter, y = theta, color = proposal), data = taken, size = 2) +
+  # Add each set of rejected proposals separately
+  {if(length(props_list) > 0) {
+    lapply(props_list, function(prop_df) {
+      list(
+        geom_line(aes(x = iter, y = theta, group = line, color = proposal), 
+                  data = prop_df, alpha = 0.5),
+        geom_point(aes(x = iter, y = theta, color = proposal), 
+                   data = prop_df, alpha = 0.5)
+      )
+    })
+  }} +
+  # Add accepted chain
+  geom_line(aes(x = iter, y = theta, color = proposal), 
+            data = taken, linewidth = 0.7) +
+  geom_point(aes(x = iter, y = theta, color = proposal), 
+             data = taken, size = 2) +
   scale_colour_manual(
     name = "Proposal",
     values = c(
@@ -457,6 +459,7 @@ geom_line(aes(x = iter, y = theta, group = line, color = proposal), data = prop_
   labs(y = TeX("$\\theta$")) +
   theme(axis.title.y = element_text(angle = 0, vjust = 0.5)) +
   theme(legend.position = "none")
+p1
 
 
 
@@ -504,7 +507,7 @@ p2 = p2 + theme_bw(base_size = 12) +
         axis.title.x = element_text()) +
   labs(x = "iter") +
   scale_y_continuous(limits = c(41, 43), breaks = c(41, 42, 43))
-
+p2
 
 m1 = brm(y ~ 1, data = data, chains = 2, file = "models/m1")
 
@@ -520,17 +523,6 @@ p3 = mcmc_areas(m1, pars = "b_Intercept") +
         axis.ticks.y = element_blank(),
         axis.text.y = element_blank())
 
-
-# p3 = mcmc_trace(m1, pars = "b_Intercept", size = 2)
-# p3 = p3 + theme_bw(base_size = 12) +
-#   theme(axis.title.y = element_blank(),
-#         panel.grid.major = element_blank(),
-#         panel.grid.minor = element_blank(),
-#         axis.text.y = element_blank(),
-#         axis.ticks.y = element_blank(),
-#         axis.title.x = element_text()) +
-#   labs(x = "iter")
-
 (p1 + guides(color = "none") + p2 + p3) + 
   plot_layout(guides = 'collect') & 
   theme(legend.position = "none",
@@ -540,3 +532,242 @@ p3 = mcmc_areas(m1, pars = "b_Intercept") +
 
 ggsave(filename = "figures/mcmc.pdf",
        width = (210-50)*1.2, height = ((297 - 70)/4) * 1, units = "mm", useDingbats = TRUE)
+
+
+# 1.4 Diagnostics
+
+## Trace Plots
+set.seed(12345)
+dat <- data.frame(
+  Iteration = rep(1:1000, 8),
+  Chain = factor(rep(c(1:2, 1:2, 1:2, 1:2), each = 1000)),
+  Cond = factor(rep(1:4, each = 2000))
+) %>%
+  mutate(
+    Simulation = c(
+      arima.sim(list(ar = 0.7), n = 1000, sd = 0.5),
+      arima.sim(list(ar = 0.7), n = 1000, sd = 0.5),
+      -2 + arima.sim(list(ar = 0.7), n = 1000, sd = 0.5),
+      1 + arima.sim(list(ar = 0.7), n = 1000, sd = 0.5),
+      -2 + 0.003 * 1:1000 + arima.sim(list(ar = 0.7), n = 1000, sd = 0.5),
+      1 + -0.003 * 1:1000 + arima.sim(list(ar = 0.7), n = 1000, sd = 0.5),
+      arima.sim(list(ar = 0.7), n = 1000, sd = 0.8),
+      arima.sim(list(ar = 0.7), n = 1000, sd = 0.3)
+    )
+  )
+
+build_draw_array <- function(sim_data, cond) {
+  cond_frame = dat %>% 
+    filter(Cond == cond)
+  array(
+    data = c(
+      filter(cond_frame, Chain == 1)$Simulation,
+      filter(cond_frame, Chain == 2)$Simulation
+    ),
+    dim = c(nrow(cond_frame)/2, 2, 1),
+    dimnames = list(iterations = 1:length(filter(cond_frame, Chain == 1)$Simulation),
+                    chains = c("1", "2"),
+                    variables = "theta")
+  )
+}
+
+line_size = 0.4
+p1 = mcmc_trace(m1, size = line_size, pars = "b_Intercept") +
+  theme_bw(base_size = 12) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.title.x = element_blank(), 
+        axis.ticks.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.title = element_blank(),
+        legend.position = "none")
+p1
+
+p2 = mcmc_trace(build_draw_array(dat, 2), size = line_size) +
+  theme_bw(base_size = 12) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.title.x = element_blank(), 
+        axis.ticks.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.title = element_blank(),
+        legend.position = "none")
+p2
+
+p3 = mcmc_trace(build_draw_array(dat, 3), size = line_size) +
+  theme_bw(base_size = 12) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.title.x = element_blank(), 
+        axis.ticks.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.title = element_blank(),
+        legend.position = "none")
+p3
+
+p4 = mcmc_trace(build_draw_array(dat, 4), size = line_size) +
+  theme_bw(base_size = 12) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.title.x = element_blank(), 
+        axis.ticks.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.title = element_blank(),
+        legend.position = "none")
+p4
+
+BP1 = (p1 + p2 + p3 + p4) + 
+  plot_layout(nrow = 1)
+BP1
+
+ggsave(filename = "figures/chains.pdf",
+       width = (210-50)*1.2, height = ((297 - 70)/4) * 0.65, units = "mm", useDingbats = TRUE)
+
+## Rank and ecdf plots
+
+p1 = mcmc_rank_overlay(m1, pars = "b_Intercept") +
+  theme_bw(base_size = 12) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.title.x = element_blank(), 
+        axis.ticks.y = element_blank(),
+        axis.text.y = element_blank(),
+        legend.position = "none") +
+  scale_y_continuous(limits = c(40, 60)) +
+  theme(axis.title.y = element_text(angle = 0, vjust = 0.5))
+p1
+
+p2 = mcmc_rank_overlay(build_draw_array(dat, 2)) +
+  theme_bw(base_size = 12) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.title.x = element_blank(), 
+        axis.ticks.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.title = element_blank(),
+        legend.position = "none")
+p2
+
+p3 = mcmc_rank_overlay(build_draw_array(dat, 3)) +
+  theme_bw(base_size = 12) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.title.x = element_blank(), 
+        axis.ticks.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.title = element_blank(),
+        legend.position = "none") +
+  scale_y_continuous(limits = c(30, 70))
+p3
+
+p4 = mcmc_rank_overlay(build_draw_array(dat, 4)) +
+  theme_bw(base_size = 12) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.title.x = element_blank(), 
+        axis.ticks.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.title = element_blank(),
+        legend.position = "none")
+p4
+
+BP2 = (p1 + p2 + p3 + p4) + 
+  plot_layout(nrow = 1)
+BP2
+
+ggsave(filename = "figures/trace_ranks.pdf",
+       width = (210-50)*1.2, height = ((297 - 70)/4) * 0.65, units = "mm", useDingbats = TRUE)
+
+p1 = mcmc_rank_ecdf(as_draws_array(m1, variable = "b_Intercept"), plot_diff = TRUE, interpolate_adj = FALSE) +
+  theme_bw(base_size = 12) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.title.x = element_blank(), 
+        axis.ticks.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.title.y = element_blank(),
+        legend.position = "none")
+
+p2 = mcmc_rank_ecdf(build_draw_array(dat, 2), plot_diff = TRUE, interpolate_adj = FALSE) +
+  theme_bw(base_size = 12) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.title.x = element_blank(), 
+        axis.ticks.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.title = element_blank(),
+        legend.position = "none")
+
+p3 = mcmc_rank_ecdf(build_draw_array(dat, 3), plot_diff = TRUE, interpolate_adj = FALSE) +
+  theme_bw(base_size = 12) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.title.x = element_blank(), 
+        axis.ticks.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.title = element_blank(),
+        legend.position = "none")
+
+p4 = mcmc_rank_ecdf(build_draw_array(dat, 4), plot_diff = TRUE, interpolate_adj = FALSE) +
+  theme_bw(base_size = 12) +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.title.x = element_blank(), 
+        axis.ticks.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.title = element_blank(),
+        legend.position = "none")
+
+BP3 = (p1 + p2 + p3 + p4) + 
+  plot_layout(nrow = 1)
+BP3
+
+ggsave(filename = "figures/ecdf_diff.pdf",
+       width = (210-50)*1.2, height = ((297 - 70)/4) * 0.85, units = "mm", useDingbats = TRUE)
+
+
+(BP1 / BP2 / BP3) + plot_layout(heights = c(1, 1, 1.3))
+ggsave(filename = "figures/vis_diag.pdf",
+       width = (210-50)*1.2, height = ((297 - 70)/4) * 1.75, units = "mm", useDingbats = TRUE)
+
+
+
+rhat(as_draws_array(m1, variable = "b_Intercept"))
+ess_bulk(as_draws_array(m1, variable = "b_Intercept"))
+ess_tail(as_draws_array(m1, variable = "b_Intercept"))
+
+rhat(build_draw_array(dat, 2))
+ess_bulk(build_draw_array(dat, 2))
+ess_tail(build_draw_array(dat, 2))
+
+rhat(build_draw_array(dat, 3))
+ess_bulk(build_draw_array(dat, 3))
+ess_tail(build_draw_array(dat, 3))
+
+rhat(build_draw_array(dat, 4))
+ess_bulk(build_draw_array(dat, 4))
+ess_tail(build_draw_array(dat, 4))
