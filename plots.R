@@ -537,7 +537,7 @@ ggsave(filename = "figures/mcmc.pdf",
 # 1.4 Diagnostics
 
 ## Trace Plots
-set.seed(12345)
+set.seed(123)
 dat <- data.frame(
   Iteration = rep(1:1000, 8),
   Chain = factor(rep(c(1:2, 1:2, 1:2, 1:2), each = 1000)),
@@ -549,17 +549,16 @@ dat <- data.frame(
       arima.sim(list(ar = 0.7), n = 1000, sd = 0.5),
       -2 + arima.sim(list(ar = 0.7), n = 1000, sd = 0.5),
       1 + arima.sim(list(ar = 0.7), n = 1000, sd = 0.5),
-      -2 + 0.003 * 1:1000 + arima.sim(list(ar = 0.7), n = 1000, sd = 0.5),
-      1 + -0.003 * 1:1000 + arima.sim(list(ar = 0.7), n = 1000, sd = 0.5),
+      - + 0.003 * 1:1000 + arima.sim(list(ar = 0.7), n = 1000, sd = 0.5),
+      1 + -0.001 * 1:1000 + arima.sim(list(ar = 0.7), n = 1000, sd = 0.5),
       arima.sim(list(ar = 0.7), n = 1000, sd = 0.8),
       arima.sim(list(ar = 0.7), n = 1000, sd = 0.3)
     )
   )
 
-build_draw_array <- function(sim_data, cond) {
-  cond_frame = dat %>% 
-    filter(Cond == cond)
-  array(
+build_draw_array <- function(sim_data, cond, split = FALSE) {
+  cond_frame = filter(sim_data, Cond == cond)
+  draws = as_draws(array(
     data = c(
       filter(cond_frame, Chain == 1)$Simulation,
       filter(cond_frame, Chain == 2)$Simulation
@@ -568,7 +567,12 @@ build_draw_array <- function(sim_data, cond) {
     dimnames = list(iterations = 1:length(filter(cond_frame, Chain == 1)$Simulation),
                     chains = c("1", "2"),
                     variables = "theta")
-  )
+  ))
+  if(split){
+   return(split_chains(draws))
+  } else {
+    draws
+  }
 }
 
 line_size = 0.4
@@ -633,7 +637,8 @@ ggsave(filename = "figures/chains.pdf",
 
 ## Rank and ecdf plots
 
-p1 = mcmc_rank_overlay(m1, pars = "b_Intercept") +
+#p1 = mcmc_rank_overlay(build_draw_array(dat, 1)) +
+p1 = mcmc_rank_overlay(m1, pars = c("Intercept")) +
   theme_bw(base_size = 12) +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
@@ -643,7 +648,7 @@ p1 = mcmc_rank_overlay(m1, pars = "b_Intercept") +
         axis.ticks.y = element_blank(),
         axis.text.y = element_blank(),
         legend.position = "none") +
-  scale_y_continuous(limits = c(40, 60)) +
+  scale_y_continuous(limits = c(30, 70)) +
   theme(axis.title.y = element_text(angle = 0, vjust = 0.5))
 p1
 
@@ -670,8 +675,7 @@ p3 = mcmc_rank_overlay(build_draw_array(dat, 3)) +
         axis.ticks.y = element_blank(),
         axis.text.y = element_blank(),
         axis.title = element_blank(),
-        legend.position = "none") +
-  scale_y_continuous(limits = c(30, 70))
+        legend.position = "none")
 p3
 
 p4 = mcmc_rank_overlay(build_draw_array(dat, 4)) +
@@ -694,7 +698,8 @@ BP2
 ggsave(filename = "figures/trace_ranks.pdf",
        width = (210-50)*1.2, height = ((297 - 70)/4) * 0.65, units = "mm", useDingbats = TRUE)
 
-p1 = mcmc_rank_ecdf(as_draws_array(m1, variable = "b_Intercept"), plot_diff = TRUE, interpolate_adj = FALSE) +
+#p1 = mcmc_rank_ecdf(build_draw_array(dat, 1), plot_diff = TRUE, interpolate_adj = FALSE) +
+p1 = mcmc_rank_ecdf(m1, pars = c("Intercept"), plot_diff = TRUE, interpolate_adj = FALSE) +
   theme_bw(base_size = 12) +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
@@ -705,6 +710,7 @@ p1 = mcmc_rank_ecdf(as_draws_array(m1, variable = "b_Intercept"), plot_diff = TR
         axis.text.y = element_blank(),
         axis.title.y = element_blank(),
         legend.position = "none")
+p1
 
 p2 = mcmc_rank_ecdf(build_draw_array(dat, 2), plot_diff = TRUE, interpolate_adj = FALSE) +
   theme_bw(base_size = 12) +
@@ -717,6 +723,7 @@ p2 = mcmc_rank_ecdf(build_draw_array(dat, 2), plot_diff = TRUE, interpolate_adj 
         axis.text.y = element_blank(),
         axis.title = element_blank(),
         legend.position = "none")
+p2
 
 p3 = mcmc_rank_ecdf(build_draw_array(dat, 3), plot_diff = TRUE, interpolate_adj = FALSE) +
   theme_bw(base_size = 12) +
@@ -729,6 +736,7 @@ p3 = mcmc_rank_ecdf(build_draw_array(dat, 3), plot_diff = TRUE, interpolate_adj 
         axis.text.y = element_blank(),
         axis.title = element_blank(),
         legend.position = "none")
+p3
 
 p4 = mcmc_rank_ecdf(build_draw_array(dat, 4), plot_diff = TRUE, interpolate_adj = FALSE) +
   theme_bw(base_size = 12) +
@@ -741,6 +749,7 @@ p4 = mcmc_rank_ecdf(build_draw_array(dat, 4), plot_diff = TRUE, interpolate_adj 
         axis.text.y = element_blank(),
         axis.title = element_blank(),
         legend.position = "none")
+p4
 
 BP3 = (p1 + p2 + p3 + p4) + 
   plot_layout(nrow = 1)
