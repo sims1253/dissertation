@@ -7,6 +7,7 @@ library(bayesplot)
 library(brms)
 library(posterior)
 library(dplyr)
+library(tidyr)
 
 setwd("~/Documents/dr/dissertation/")
 
@@ -188,42 +189,42 @@ sequential_updating <- function()
                     shape1 = 1 + alpha,
                     shape2 = 1 - 1 + beta),
                   linewidth = linewidth) +
-    geom_segment(aes(x = qbeta(0.975,
-                               0 + alpha,
-                               0 - 0 + beta),
-                     y = 0, xend = qbeta(0.975,
-                                         0 + alpha,
-                                         0 - 0 + beta),
-                     yend = 3, 
-                     color = "Prior", linetype = "CI"),
-                 linewidth = linewidth) +
-    geom_segment(aes(x = qbeta(0.025,
-                               0 + alpha,
-                               0 - 0 + beta),
-                     y = 0, xend = qbeta(0.025,
-                                         0 + alpha,
-                                         0 - 0 + beta),
-                     yend = 3, 
-                     color = "Prior", linetype = "CI"),
-                 linewidth = linewidth) +
-    geom_segment(aes(x = qbeta(0.975,
-                               1 + alpha,
-                               1 - 1 + beta),
-                     y = 0, xend = qbeta(0.975,
-                                         1 + alpha,
-                                         1 - 1 + beta),
-                     yend = 3, 
-                     color = "Posterior", linetype = "CI"),
-                 linewidth = linewidth) +
-    geom_segment(aes(x = qbeta(0.025,
-                               1 + alpha,
-                               1 - 1 + beta),
-                     y = 0, xend = qbeta(0.025,
-                                         1 + alpha,
-                                         1 - 1 + beta),
-                     yend = 3, 
-                     color = "Posterior", linetype = "CI"),
-                 linewidth = linewidth) +
+    # geom_segment(aes(x = qbeta(0.975,
+    #                            0 + alpha,
+    #                            0 - 0 + beta),
+    #                  y = 0, xend = qbeta(0.975,
+    #                                      0 + alpha,
+    #                                      0 - 0 + beta),
+    #                  yend = 3, 
+    #                  color = "Prior", linetype = "CI"),
+    #              linewidth = linewidth) +
+    # geom_segment(aes(x = qbeta(0.025,
+    #                            0 + alpha,
+    #                            0 - 0 + beta),
+    #                  y = 0, xend = qbeta(0.025,
+    #                                      0 + alpha,
+    #                                      0 - 0 + beta),
+    #                  yend = 3, 
+    #                  color = "Prior", linetype = "CI"),
+    #              linewidth = linewidth) +
+    # geom_segment(aes(x = qbeta(0.975,
+    #                            1 + alpha,
+    #                            1 - 1 + beta),
+    #                  y = 0, xend = qbeta(0.975,
+    #                                      1 + alpha,
+    #                                      1 - 1 + beta),
+    #                  yend = 3, 
+    #                  color = "Posterior", linetype = "CI"),
+    #              linewidth = linewidth) +
+    # geom_segment(aes(x = qbeta(0.025,
+    #                            1 + alpha,
+    #                            1 - 1 + beta),
+    #                  y = 0, xend = qbeta(0.025,
+    #                                      1 + alpha,
+    #                                      1 - 1 + beta),
+    #                  yend = 3, 
+    #                  color = "Posterior", linetype = "CI"),
+    #              linewidth = linewidth) +
     shared_theme +
     shared_colors +
     shared_fills +
@@ -262,42 +263,42 @@ sequential_updating <- function()
                     shape1 = 3 + alpha,
                     shape2 = 10 - 3 + beta),
                   linewidth = linewidth) +
-    geom_segment(aes(x = qbeta(0.975,
-                               2 + alpha,
-                               9 - 2 + beta),
-                     y = 0, xend = qbeta(0.975,
-                                         2 + alpha,
-                                         9 - 2 + beta),
-                     yend = 3, 
-                     color = "Prior", linetype = "CI"),
-                 linewidth = linewidth) +
-    geom_segment(aes(x = qbeta(0.025,
-                               2 + alpha,
-                               9 - 2 + beta),
-                     y = 0, xend = qbeta(0.025,
-                                         2 + alpha,
-                                         9 - 2 + beta),
-                     yend = 3, 
-                     color = "Prior", linetype = "CI"),
-                 linewidth = linewidth) +
-    geom_segment(aes(x = qbeta(0.975,
-                               3 + alpha,
-                               10 - 3 + beta),
-                     y = 0, xend = qbeta(0.975,
-                                         3 + alpha,
-                                         10 - 3 + beta),
-                     yend = 3, 
-                     color = "Posterior", linetype = "CI"),
-                 linewidth = linewidth) +
-    geom_segment(aes(x = qbeta(0.025,
-                               3 + alpha,
-                               10 - 3 + beta),
-                     y = 0, xend = qbeta(0.025,
-                                         3 + alpha,
-                                         10 - 3 + beta),
-                     yend = 3, 
-                     color = "Posterior", linetype = "CI"),
-                 linewidth = linewidth) +
+    # geom_segment(aes(x = qbeta(0.975,
+    #                            2 + alpha,
+    #                            9 - 2 + beta),
+    #                  y = 0, xend = qbeta(0.975,
+    #                                      2 + alpha,
+    #                                      9 - 2 + beta),
+    #                  yend = 3, 
+    #                  color = "Prior", linetype = "CI"),
+    #              linewidth = linewidth) +
+    # geom_segment(aes(x = qbeta(0.025,
+    #                            2 + alpha,
+    #                            9 - 2 + beta),
+    #                  y = 0, xend = qbeta(0.025,
+    #                                      2 + alpha,
+    #                                      9 - 2 + beta),
+    #                  yend = 3, 
+    #                  color = "Prior", linetype = "CI"),
+    #              linewidth = linewidth) +
+    # geom_segment(aes(x = qbeta(0.975,
+    #                            3 + alpha,
+    #                            10 - 3 + beta),
+    #                  y = 0, xend = qbeta(0.975,
+    #                                      3 + alpha,
+    #                                      10 - 3 + beta),
+    #                  yend = 3, 
+    #                  color = "Posterior", linetype = "CI"),
+    #              linewidth = linewidth) +
+    # geom_segment(aes(x = qbeta(0.025,
+    #                            3 + alpha,
+    #                            10 - 3 + beta),
+    #                  y = 0, xend = qbeta(0.025,
+    #                                      3 + alpha,
+    #                                      10 - 3 + beta),
+    #                  yend = 3, 
+    #                  color = "Posterior", linetype = "CI"),
+    #              linewidth = linewidth) +
     shared_theme +
     shared_colors +
     shared_fills +
@@ -336,42 +337,42 @@ sequential_updating <- function()
                     shape1 = 6 + alpha,
                     shape2 = 20 - 6 + beta),
                   linewidth = linewidth) +
-    geom_segment(aes(x = qbeta(0.975,
-                               5 + alpha,
-                               19 - 5 + beta),
-                     y = 0, xend = qbeta(0.975,
-                                         5 + alpha,
-                                         19 - 5 + beta),
-                     yend = 3, 
-                     color = "Prior", linetype = "CI"),
-                 linewidth = linewidth) +
-    geom_segment(aes(x = qbeta(0.025,
-                               5 + alpha,
-                               19 - 5 + beta),
-                     y = 0, xend = qbeta(0.025,
-                                         5 + alpha,
-                                         19 - 5 + beta),
-                     yend = 3, 
-                     color = "Prior", linetype = "CI"),
-                 linewidth = linewidth) +
-    geom_segment(aes(x = qbeta(0.975,
-                               6 + alpha,
-                               20 - 6 + beta),
-                     y = 0, xend = qbeta(0.975,
-                                         6 + alpha,
-                                         20 - 6 + beta),
-                     yend = 3, 
-                     color = "Posterior", linetype = "CI"),
-                 linewidth = linewidth) +
-    geom_segment(aes(x = qbeta(0.025,
-                               6 + alpha,
-                               20 - 6 + beta),
-                     y = 0, xend = qbeta(0.025,
-                                         6 + alpha,
-                                         20 - 6 + beta),
-                     yend = 3, 
-                     color = "Posterior", linetype = "CI"),
-                 linewidth = linewidth) +
+    # geom_segment(aes(x = qbeta(0.975,
+    #                            5 + alpha,
+    #                            19 - 5 + beta),
+    #                  y = 0, xend = qbeta(0.975,
+    #                                      5 + alpha,
+    #                                      19 - 5 + beta),
+    #                  yend = 3, 
+    #                  color = "Prior", linetype = "CI"),
+    #              linewidth = linewidth) +
+    # geom_segment(aes(x = qbeta(0.025,
+    #                            5 + alpha,
+    #                            19 - 5 + beta),
+    #                  y = 0, xend = qbeta(0.025,
+    #                                      5 + alpha,
+    #                                      19 - 5 + beta),
+    #                  yend = 3, 
+    #                  color = "Prior", linetype = "CI"),
+    #              linewidth = linewidth) +
+    # geom_segment(aes(x = qbeta(0.975,
+    #                            6 + alpha,
+    #                            20 - 6 + beta),
+    #                  y = 0, xend = qbeta(0.975,
+    #                                      6 + alpha,
+    #                                      20 - 6 + beta),
+    #                  yend = 3, 
+    #                  color = "Posterior", linetype = "CI"),
+    #              linewidth = linewidth) +
+    # geom_segment(aes(x = qbeta(0.025,
+    #                            6 + alpha,
+    #                            20 - 6 + beta),
+    #                  y = 0, xend = qbeta(0.025,
+    #                                      6 + alpha,
+    #                                      20 - 6 + beta),
+    #                  yend = 3, 
+    #                  color = "Posterior", linetype = "CI"),
+    #              linewidth = linewidth) +
     shared_theme +
     shared_colors +
     shared_fills +
@@ -780,3 +781,452 @@ ess_tail(build_draw_array(dat, 3))
 rhat(build_draw_array(dat, 4))
 ess_bulk(build_draw_array(dat, 4))
 ess_tail(build_draw_array(dat, 4))
+
+
+# 2.1 Likelihood Examples
+likelihood_examples_plot <- function() {
+  
+  base_theme <- theme_bw(base_size = 10) +
+    theme(panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(),
+          axis.ticks.y = element_blank(),
+          axis.text.y = element_blank(),
+          axis.title.y = element_blank(),
+          plot.title = element_text(hjust = 0.5, size = 10)) # Center title and adjust size
+  
+  # Normal Distribution
+  p_norm <- ggplot(data.frame(x = c(-4, 4)), aes(x = x)) +
+    stat_function(fun = dnorm, args = list(mean = 0, sd = 1), color = PALETTE[[2]], linewidth = 0.6) +
+    base_theme +
+    labs(title = "Normal", x = "Value")
+  
+  # Poisson Distribution
+  poisson_lambda <- 4
+  poisson_data <- data.frame(x = 0:10, y = dpois(0:10, lambda = poisson_lambda))
+  p_pois <- ggplot(poisson_data, aes(x = x, y = y)) +
+    geom_bar(stat = "identity", fill = PALETTE[[2]], width = 0.5) +
+    base_theme +
+    scale_x_continuous(breaks = seq(0, 10, by = 2)) + 
+    labs(title = "Poisson", x = "Count")
+    
+  # Exponential Distribution
+  p_exp <- ggplot(data.frame(x = c(0, 5)), aes(x = x)) +
+    stat_function(fun = dexp, args = list(rate = 1), color = PALETTE[[2]],
+    linewidth = 0.6) +
+    base_theme +
+    labs(title = "Exponential", x = "Value")
+    
+  # Beta Distribution
+  p_beta <- ggplot(data.frame(x = c(0, 1)), aes(x = x)) +
+    stat_function(fun = dbeta, args = list(shape1 = 2, shape2 = 5), color = PALETTE[[2]], linewidth = 0.6) +
+    scale_x_continuous(breaks = c(0, 0.5, 1)) +
+    base_theme +
+    labs(title = "Beta", x = "Proportion")
+
+  # Combine plots
+  combined_plot <- p_norm + p_pois + p_exp + p_beta + plot_layout(nrow = 1)
+  
+  return(combined_plot)
+}
+
+likelihood_plot <- likelihood_examples_plot()
+likelihood_plot
+
+ggsave(filename = "figures/likelihood_examples.pdf",
+       plot = likelihood_plot,
+       width = 210-50, height = ((297 - 70)/5), units = "mm", useDingbats = TRUE)
+
+
+# 2.2 Link Function Examples
+link_examples_plot <- function() {
+  
+  # Base theme similar to likelihood_examples_plot
+  base_theme <- theme_bw(base_size = 10) +
+    theme(panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(),
+          plot.title = element_text(hjust = 0.5, size = 10))
+  
+  eta_vals <- c(-5, 5)
+  line_color = PALETTE[[2]]
+  line_width = 0.6
+  
+  # Identity Link (Inverse)
+  p_identity <- ggplot(data.frame(eta = eta_vals), aes(x = eta)) +
+    stat_function(fun = function(eta) eta, color = line_color, linewidth = line_width) +
+    base_theme +
+    labs()+
+    labs(title = "Identity", x = TeX("$\\eta$"), y = TeX("Mean Parameter ($\\mu$)")) +
+    coord_cartesian(ylim = eta_vals)
+
+  # Log Link (Inverse: Exponential)
+  p_log <- ggplot(data.frame(eta = eta_vals), aes(x = eta)) +
+    stat_function(fun = exp, color = line_color, linewidth = line_width) +
+    base_theme +
+    labs(title = "Log", x = TeX("$\\eta$")) +
+    theme(axis.title.y = element_blank()) +
+    coord_cartesian(ylim = c(0, exp(eta_vals[2]))) # Y starts at 0
+
+  # Logit Link (Inverse: Logistic)
+  p_logit <- ggplot(data.frame(eta = eta_vals), aes(x = eta)) +
+    stat_function(fun = function(eta) 1 / (1 + exp(-eta)), color = line_color, linewidth = line_width) +
+    scale_y_continuous(breaks = c(0, 0.5, 1)) + # Specific breaks for [0,1]
+    base_theme +
+    theme(axis.title.y = element_blank()) + # Keep text for logit
+    labs(title = "Logit", x = TeX("$\\eta$")) +
+    coord_cartesian(ylim = c(0, 1)) # Y is bounded [0,1]
+
+  # Combine plots
+  # Add common y-axis label manually via patchwork annotation if desired, 
+  # but individual plots follow the likelihood_examples style for now.
+  combined_plot <- p_identity + p_log + p_logit + plot_layout(nrow = 1)
+  
+  return(combined_plot)
+}
+
+link_plot <- link_examples_plot()
+link_plot
+
+# Use similar height as likelihood_examples
+ggsave(filename = "figures/link_examples.pdf",
+       plot = link_plot,
+       width = 210-50, height = ((297 - 70)/5), units = "mm", useDingbats = TRUE)
+
+
+# 2.3 Link Function Step Illustration
+link_steps_plot <- function() {
+
+  logistic <- function(eta) 1 / (1 + exp(-eta))
+  eta_range <- seq(-6, 6, length.out = 300)
+  # Define starting points on the eta scale and the constant step size
+  start_etas <- c(-0.75, 2.5)
+  delta_eta <- 1.5
+
+  # Data for the main logistic curve
+  curve_data <- data.frame(eta = eta_range, mu = logistic(eta_range))
+
+  # Calculate start/end points for eta and mu for each step
+  steps_data <- map_df(start_etas, function(eta1) {
+    eta2 <- eta1 + delta_eta
+    mu1 <- logistic(eta1)
+    mu2 <- logistic(eta2)
+    data.frame(
+      eta1 = eta1, eta2 = eta2, mu1 = mu1, mu2 = mu2,
+      delta_mu = mu2 - mu1,
+      start_eta_group = factor(eta1) # Group steps by starting eta
+    )
+  })
+
+  # Pre-generate the TeX labels as a separate vector
+  delta_mu_labels <- TeX(sprintf("$\\Delta\\mu \\approx %.2f$", steps_data$delta_mu))
+
+  # Base theme consistent with other plots
+  base_theme <- theme_bw(base_size = 10) +
+    theme(panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(),
+          legend.position = "none",
+          # Explicitly set axis text and title to black if theme_bw default isn't sufficient
+          axis.text = element_text(color = "black"),
+          axis.title = element_text(color = "black")
+          )
+
+  p <- ggplot() +
+    # Plot the logistic curve - Changed color to "black"
+    geom_line(data = curve_data, aes(x = eta, y = mu),
+     color = PALETTE[2], linewidth = 0.6) +
+
+    # Horizontal segments representing delta_eta
+    geom_segment(data = steps_data,
+                 aes(x = eta1, y = mu1, xend = eta2, yend = mu1),
+                 arrow = arrow(length = unit(0.15, "cm"), ends = "last", type = "closed"),
+                 linewidth = 0.4,
+                 color = "black") + # Set fixed color OUTSIDE aes()
+
+    # Vertical segments representing delta_mu
+    geom_segment(data = steps_data,
+                 aes(x = eta2, y = mu1, xend = eta2, yend = mu2), # Removed color from aes()
+                 arrow = arrow(length = unit(0.15, "cm"), ends = "last", type = "closed"),
+                 linewidth = 0.4,
+                 color = "black") + # Set fixed color OUTSIDE aes()
+
+    # Add text labels for delta_eta
+    geom_text(data = steps_data,
+      aes(x = eta1 + delta_eta / 2, y = mu1),
+      label = TeX("$\\Delta\\eta$"),
+      vjust = 1.5, size = 3.5, show.legend = FALSE,
+      color = "black") + # Set fixed color OUTSIDE aes()
+
+    # Add text labels for delta_mu, showing the calculated difference
+    geom_text(data = steps_data,
+      aes(x = eta2, y = mu1 + delta_mu / 4), # Removed color from aes()
+      label = delta_mu_labels, # Use pre-generated labels
+      hjust = -0.1, size = 3.5, show.legend = FALSE,
+      color = "black") + # Set fixed color OUTSIDE aes()
+
+    labs(x = TeX("Linear Predictor ($\\eta$)"),
+         y = TeX("Mean Parameter ($\\mu$)")) +
+    scale_y_continuous(breaks = c(0, 0.25, 0.5, 0.75, 1.0), limits = c(0, 1)) +
+    base_theme # Theme already sets axis text/titles to black by default or explicitly
+
+  return(p)
+}
+
+# Generate the plot object
+link_steps_plot_obj <- link_steps_plot()
+link_steps_plot_obj
+
+# Save the plot with the specified filename and adjusted dimensions
+ggsave(filename = "figures/logit_steps.pdf", 
+       plot = link_steps_plot_obj,
+       width = 210-80, height = ((297 - 70)/4), units = "mm", useDingbats = TRUE)
+
+
+# 2.4 Conditional Effects Illustration
+conditional_effect_plot <- function(n_draws = 1000, n_points = 100) {
+  set.seed(1234) # for reproducibility
+  
+  # Simulate posterior draws for coefficients (logit scale)
+  # Intercept, effect of x1, effect of x2, interaction x1:x2
+  beta_draws <- data.frame(
+    beta0 = rnorm(n_draws, -0.5, 0.5),
+    beta1 = rnorm(n_draws, 0.8, 0.4),
+    beta2 = rnorm(n_draws, -0.6, 0.3),
+    beta3 = rnorm(n_draws, 0.5, 0.2) 
+  ) %>% mutate(draw = 1:n()) # Add draw ID
+  
+  # Define range for predictor x1 and specific values for x2
+  x1_range <- seq(-2, 2, length.out = n_points)
+  x2_values <- c(-1, 1) # e.g., low and high values or two groups
+  
+  # Inverse logit function
+  inv_logit <- function(x) 1 / (1 + exp(-x))
+  
+  # Calculate predictions for each draw, x1 value, and x2 value
+  pred_data <- expand.grid(draw = 1:n_draws, x1 = x1_range, x2 = x2_values) %>%
+    left_join(beta_draws, by = "draw") %>%
+    mutate(
+      eta = beta0 + beta1 * x1 + beta2 * x2 + beta3 * x1 * x2,
+      mu = inv_logit(eta)
+    )
+    
+  # Summarize predictions (mean and 95% CI)
+  summary_data <- pred_data %>%
+    group_by(x1, x2) %>%
+    summarise(
+      mu_mean = mean(mu),
+      mu_lower = quantile(mu, 0.025),
+      mu_upper = quantile(mu, 0.975),
+      .groups = 'drop'
+    ) %>%
+    mutate(x2_label = factor(x2, levels = x2_values, labels = paste("x2 =", x2_values))) # Create factor for plotting
+
+  # Base theme
+  base_theme <- theme_bw(base_size = 10) +
+    theme(panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(),
+          legend.position = c(0.8, 0.2), # Position legend inside plot
+          legend.background = element_rect(fill = alpha("white", 0.5))) # Semi-transparent background
+
+  # Create the plot
+  p <- ggplot(summary_data, aes(x = x1, y = mu_mean, color = x2_label, fill = x2_label)) +
+    geom_line(linewidth = 0.6) +
+    geom_ribbon(aes(ymin = mu_lower, ymax = mu_upper), alpha = 0.2, linetype = 0) + # Ribbons for CI
+    scale_color_manual(name = "Condition", values = PALETTE[c(3, 5)]) +
+    scale_fill_manual(name = "Condition", values = PALETTE[c(3, 5)]) +
+    labs(
+      x = TeX("Predictor $x_1$"),
+      y = TeX("Predicted Outcome ($\\mu$)")
+    ) +
+    scale_y_continuous(limits = c(0, 1)) +
+    base_theme +
+    theme(plot.title = element_text(hjust = 0.5, size = 10)) # Center title
+
+  return(p)
+}
+
+# Generate the plot object
+conditional_effect_plot_obj <- conditional_effect_plot()
+conditional_effect_plot_obj
+
+# Save the plot
+ggsave(filename = "figures/conditional_effect_example.pdf", 
+       plot = conditional_effect_plot_obj,
+       width = 210-80, height = ((297 - 70)/4) * 0.8, units = "mm", useDingbats = TRUE)
+
+
+# 3.1 Prior Sensitivity Analysis using manual density plots
+
+# Define the function for prior sensitivity plot
+prior_sensitivity_plot_manual <- function(n_sims = 15, n_draws_per_sim = 1000) { # Reduced n_sims further for pp_check style
+  set.seed(2024) # for reproducibility
+
+  # Define prior settings
+  priors <- list(
+    Narrow = list(intercept_mean = 0, intercept_sd = 0.1, sigma_mean = 0, sigma_sd = 0.2),
+    Reasonable = list(intercept_mean = 0, intercept_sd = 5, sigma_mean = 3, sigma_sd = 1),
+    Wide = list(intercept_mean = 0, intercept_sd = 50, sigma_mean = 0, sigma_sd = 50)
+  )
+
+  # Simulate prior predictive data
+  sim_data_list <- list()
+  for (prior_name in names(priors)) {
+    prior_params <- priors[[prior_name]]
+    
+    # Draw parameters from priors
+    intercept_draws <- rnorm(n_sims, prior_params$intercept_mean, prior_params$intercept_sd)
+    # Ensure sigma is positive and non-zero, using max(0.01, ...) avoids issues with sd=0
+    sigma_draws <- pmax(0.01, abs(rnorm(n_sims, prior_params$sigma_mean, prior_params$sigma_sd))) 
+
+    # Simulate outcome data for each parameter draw, adding simulation ID
+    y_rep_list <- list()
+    for (i in 1:n_sims) {
+      y_rep_list[[i]] <- data.frame(
+        y_rep = rnorm(n_draws_per_sim, mean = intercept_draws[i], sd = sigma_draws[i]),
+        sim_id = i # Add simulation ID
+      )
+    }
+    
+    # Combine simulations for this prior
+    sim_data_list[[prior_name]] <- bind_rows(y_rep_list) %>%
+                                   mutate(prior_type = prior_name)
+  }
+  
+  # Combine all simulation data
+  all_sim_data <- bind_rows(sim_data_list) %>%
+                  mutate(prior_type = factor(prior_type, levels = names(priors))) # Ensure order
+
+  # Base theme
+  base_theme <- theme_bw(base_size = 10) +
+    theme(panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(),
+          axis.text.y = element_blank(),
+          axis.ticks.y = element_blank(),
+          axis.title.y = element_blank(),
+          strip.background = element_blank(), # Cleaner facet labels
+          plot.title = element_text(hjust = 0.5, size = 10))
+          
+  # Data for the reference N(0, 3) density curve (hypothetical 'observed' data y)
+  # Determine a reasonable range based potentially on the wide prior's output
+  plot_xlim <- c(-40, 40) 
+  ref_data <- data.frame(x = seq(plot_xlim[1], plot_xlim[2], length.out = 400)) %>%
+              mutate(y = dnorm(x, mean = 0, sd = 3)) # Hypothetical y ~ N(0, 3)
+              
+  # Calculate max density for reference curve to set y-limit + buffer
+  max_ref_density <- max(ref_data$y)
+  plot_ylim <- c(0, max_ref_density * 1.1) # Set y limit based on ref peak + 10%
+
+  # Create the density plot faceted by prior type
+  p <- ggplot(all_sim_data, aes(x = y_rep)) +
+    # Add reference N(0, 3) density (Observations color, thicker line) - Represents hypothetical y
+    geom_line(data = ref_data, aes(x = x, y = y, color = "Observations"), linewidth = 0.6, inherit.aes = FALSE) + # Added aes(color = ...)
+    # Add individual prior predictive density lines (y_rep) using geom_line(stat="density") (Prior color)
+    geom_line(stat = "density", aes(group = sim_id, color = "Prior Predictive Draws"), alpha = 0.4, linewidth = 0.3) + # Added aes(color = ...)
+    facet_wrap(~ prior_type) +
+    scale_color_manual(
+      name = "", # Legend title (empty)
+      values = c(
+        "Observations" = PALETTE[[1]], # Keep simple names for matching aes
+        "Prior Predictive Draws" = PALETTE[[3]]
+      ),
+      labels = c( # Use labels argument for TeX formatting
+        "Observations" = TeX("Observed data ($y$)"),
+        "Prior Predictive Draws" = TeX("Prior predictive draws ($y_{rep}$)")
+      )
+    ) +
+    coord_cartesian(xlim = plot_xlim, ylim = plot_ylim) + # Apply consistent x and y axis limits
+    base_theme +
+    theme(legend.position = "bottom",
+          axis.title.x = element_blank(), # Keep this theme setting to ensure x-axis title is blank
+          legend.margin = margin(t = -10)) # Add negative top margin to reduce space
+
+  return(p)
+}
+
+
+# Generate the plot object
+prior_sensitivity_plot_manual_obj <- prior_sensitivity_plot_manual()
+prior_sensitivity_plot_manual_obj
+
+# Save the plot
+ggsave(filename = "figures/prior_sensitivity.pdf", 
+       plot = prior_sensitivity_plot_manual_obj,
+       # Adjust dimensions for a 3-panel plot (wider)
+       width = 210-50, height = ((297 - 70)/4)* 0.8, units = "mm", useDingbats = TRUE)
+
+
+# 3.2 Posterior Predictive Check Illustration
+posterior_predictive_check_plot <- function(n_obs = 100, n_sims = 15) {
+  set.seed(100) # For reproducibility
+
+  # 1. Simulate observed data 'y' with outliers (from a t-distribution)
+  true_df <- 3
+  true_loc <- 0
+  true_scale <- 2
+  y_obs <- rt(n_obs, df = true_df) * true_scale + true_loc # Scale and shift standard t
+
+  # Convert y_obs to a data frame for ggplot
+  y_obs_df <- data.frame(value = y_obs, type = "Observed")
+
+  # 2. Simulate y_rep from a Normal model approximation
+  # Use true location but a smaller, fixed SD to represent a model that misses outliers
+  narrow_sd <- sd(y_obs) # Fixed narrow standard deviation
+  y_rep_norm_list <- replicate(n_sims, rnorm(n_obs, mean = true_loc, sd = narrow_sd), simplify = FALSE)
+  y_rep_norm_df <- bind_rows(lapply(1:n_sims, function(i) data.frame(value = y_rep_norm_list[[i]], sim_id = i)), .id = "sim_id_unused") %>%
+                   mutate(model = "Normal")
+
+  # 3. Simulate y_rep from a Student-t model (using true parameters)
+  y_rep_t_list <- replicate(n_sims, rt(n_obs, df = true_df) * true_scale + true_loc, simplify = FALSE)
+  y_rep_t_df <- bind_rows(lapply(1:n_sims, function(i) data.frame(value = y_rep_t_list[[i]], sim_id = i)), .id = "sim_id_unused") %>%
+                mutate(model = "Student-t")
+
+  # Combine y_rep data
+  all_y_rep_df <- bind_rows(y_rep_norm_df, y_rep_t_df)
+
+  # 4. Plotting
+  base_theme <- theme_bw(base_size = 10) +
+    theme(panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(),
+          axis.text.y = element_blank(),
+          axis.ticks.y = element_blank(),
+          axis.title.y = element_blank(),
+          strip.background = element_blank(),
+          plot.title = element_text(hjust = 0.5, size = 10),
+          legend.position = "bottom",
+          legend.margin = margin(t = -10))
+
+  # Determine plot limits based on observed data range + buffer
+  plot_xlim <- range(y_obs) + c(-1, 1) * sd(y_obs) * 0.5
+
+  # Calculate max density for observed data to set y-limit
+  density_y_obs <- density(y_obs)
+  plot_ylim <- c(0, max(density_y_obs$y) * 1.1)
+
+  p <- ggplot() +
+    # Add individual y_rep density lines (lighter color)
+    geom_line(data = all_y_rep_df, aes(x = value, group = sim_id, color = "Simulated"), stat = "density", alpha = 0.3, linewidth = 0.3) +
+    # Add observed data density line (darker color)
+    geom_line(data = y_obs_df, aes(x = value, color = "Observed"), stat = "density", linewidth = 0.7) +
+    facet_wrap(~ model) + # Facet by Normal vs Student-t
+    scale_color_manual(
+      name = "",
+      values = c(
+        "Observed" = PALETTE[[1]],
+        "Simulated" = PALETTE[[3]] # Using Prior color for simulated draws, consistent with prior sensitivity plot
+      ),
+      labels = c(
+        "Observed" = TeX("Observed data ($y$)"),
+        "Simulated" = TeX("Simulated data ($y_{rep}$)")
+      )
+    ) +
+    coord_cartesian(xlim = plot_xlim, ylim = plot_ylim) +
+    base_theme
+
+  return(p)
+}
+
+# Generate and save the plot
+posterior_predictive_check_plot_obj <- posterior_predictive_check_plot()
+posterior_predictive_check_plot_obj
+
+ggsave(filename = "figures/posterior_predictive_check.pdf",
+       plot = posterior_predictive_check_plot_obj,
+       width = 210-50, height = ((297 - 70)/4), units = "mm", useDingbats = TRUE)
